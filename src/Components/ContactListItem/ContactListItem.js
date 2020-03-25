@@ -1,4 +1,6 @@
 import React from "react";
+import { connect } from "react-redux";
+import { removeContact } from "../../redux/contacts/contactsActions";
 import PropTypes from "prop-types";
 
 import styles from "./contactList.module.css";
@@ -18,10 +20,22 @@ const ContactListItem = ({ name, number, removeContact }) => (
   </li>
 );
 
+const mapStateToProps = (state, ownProps) => {
+  const item = state.contacts.items.find(item => item.id === ownProps.id);
+
+  return {
+    ...item
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => ({
+  removeContact: () => dispatch(removeContact(ownProps.id))
+});
+
 ContactListItem.propTypes = {
   name: PropTypes.string.isRequired,
   number: PropTypes.string.isRequired,
   removeContact: PropTypes.func.isRequired
 };
 
-export default ContactListItem;
+export default connect(mapStateToProps, mapDispatchToProps)(ContactListItem);

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import contactsActions from "../../redux/contacts/contactsActions";
+import { addContact } from "../../redux/contacts/contactsActions";
 import PropTypes from "prop-types";
 
 import styles from "./contactForm.module.css";
@@ -19,6 +19,13 @@ class ContactForm extends Component {
   handleSubmit = e => {
     e.preventDefault();
     const { name, number } = this.state;
+    const findContact = this.props.contacts.find(
+      contact => contact.name === name
+    );
+    if (findContact) {
+      alert(`${findContact.name} is already consist`);
+      return;
+    }
     this.props.onAddContact(name, number);
     this.setState({ name: "", number: "" });
   };
@@ -55,12 +62,23 @@ class ContactForm extends Component {
   }
 }
 
-const mapDispatchToProps = {
-  onAddContact: contactsActions.addContact
-}
+const mapStateToProps = state => ({
+  contacts: state.contacts.items
+});
 
-export default connect(null, mapDispatchToProps)(ContactForm);
+const mapDispatchToProps = {
+  onAddContact: addContact
+};
 
 ContactForm.propTypes = {
+  contacts: PropTypes.arrayOf(
+    PropTypes.exact({
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired
+    })
+  ),
   onAddContact: PropTypes.func.isRequired
 };
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);
